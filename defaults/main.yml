@@ -1,1 +1,27 @@
 # Defaults variables for role infra-status
+
+# This simple role will add a https vhost, service infra status page, querying zabbix instance remotely through api token
+# which zabbix instance/api token should be use ? 
+# Worth knowing that just a "user role" in zabbix with *no* permissions on hosts/groups can query services and we don't need more
+status_zabbix_url: https://zabbix.host/zabbix/path/to/api_jsonrpc.php
+status_zabbix_token: 
+
+# status index.html page layout/design
+status_page_logo_url: https://www.centos.org/assets/img/centos-whitelogo.svg
+
+# additional message displayed on top (before zabbix services are displayed
+# style: can be info, warning, critical and would change the card box design
+status_message_style: info
+status_message_content: |
+ # This is an info page that can display *Markdown*
+ ## headlines are *working* too
+ Nothing to report for [now](https://time.is) ! 
+
+ 
+
+# Where should be put our script
+status_execdir: /var/lib/infra-status
+
+# httpd settings
+status_httpd_hostname: status.centos.org
+status_httpd_docroot: /var/www/infra-status

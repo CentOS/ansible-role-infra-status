@@ -1,0 +1,38 @@
+[zabbix]
+url = {{ status_zabbix_url }}
+token = {{ status_zabbix_token }}
+verify_ssl = true
+
+[general]
+title =  Infra System Status
+# Can be a relative web path (/assets/logo.svg) or an absolute URL (https://...)
+# Leave empty if you only want the text title
+logo_url = {{ status_page_logo_url }}
+output_path = {{ status_httpd_docroot }}/index.html
+refresh_interval = 60
+
+# --- Maintenance / Announcement Notice (.md) ---
+# Path to a markdown file (leave empty or delete the file when no maintenance is active)
+notice_file = {{ status_execdir }}/message.md
+# Default fallback style if not overridden in MD: warning, info, or critical
+notice_style = info
+
+# --- Service Hierarchy Expansion ---
+# 'auto'      : Automatically open parent services if they or their children have an incident
+# 'always'    : Always keep all parent services expanded
+# 'collapsed' : Keep all parent services collapsed by default
+expand_mode = auto
+
+# --- GitLab / Issue Tracker Link ---
+# Set the full URL to your GitLab issue creation page (leave empty to hide the section)
+support_url = https://gitlab.com/CentOS/infra/tracker/-/work_items
+# Custom text displayed on the action button
+support_text = Report an issue on our infra tracker
+
+[theme]
+# Customize colors (Hex, rgb, or hsl)
+background_color = #0f172a
+surface_color = #1e293b
+text_color = #f8fafc
+border_color = #334155
+

@@ -1,0 +1,34 @@
+<VirtualHost *:443>
+  ServerName {{ status_httpd_hostname }}
+  DocumentRoot {{ status_httpd_docroot }}
+  ServerAdmin webmaster@centos.org
+
+  Header always set Strict-Transport-Security "max-age=31536000"  
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Xss-Protection "1; mode=block"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "same-origin"
+
+
+ErrorLog logs/ssl-{{ status_httpd_hostname }}_error.log
+TransferLog logs/ssl-{{ status_httpd_hostname }}_access.log
+LogLevel warn
+SSLEngine on
+{{ httpd_tls_ciphers }}
+
+SSLCertificateFile /etc/pki/tls/certs/{{ status_httpd_hostname }}.crt
+SSLCertificateKeyFile /etc/pki/tls/private/{{ status_httpd_hostname }}.key
+SSLCertificateChainFile /etc/pki/tls/certs/{{ status_httpd_hostname }}-CAChain.crt
+
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl-{{ status_httpd_hostname }}_request.log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost> 

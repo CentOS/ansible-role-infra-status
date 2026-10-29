@@ -8,3 +8,66 @@
   tags:
     - vars
     - always
+
+- name: Configuring httpd
+  import_role:
+    name: httpd
+  vars:
+    httpd_tls: True
+
+- import_role:
+    name: httpd
+    tasks_from: pki-tls
+  vars:
+    pki_hostname: "{{ status_httpd_hostname }}"
+  notify:
+    - restart_httpd
+  tags:
+    - tls
+
+- name: Configuring http[s]
+  template:
+    src: "httpd/{{ item }}.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+    mode: 0644
+  notify:
+    - restart_httpd
+  with_items:
+    - 04_status.conf
+    - ssl-infra-status.conf
+  tags:
+    - httpd
+
+- name: Ensuring we have needed directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+  with_items:
+    - "{{ status_execdir }}"
+    - "{{ status_httpd_docroot }}" 
+
+- name: Importing script to generate status page
+  copy:
+    src: status_page_gen.py
+    dest: "{{ status_execdir }}/status_page_gen.py"
+  tags:
+    - script
+
+- name: Importing correct files to generate status page
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ status_execdir }}/{{ item }}"
+  with_items:
+    - message.md
+    - status_page.ini
+  tags:
+    - script
+
+- name: Ensuring we refresh every 2 min
+  cron:
+    name: Querying zabbix to generate status page
+    job: "python3 {{ status_execdir }}/status_page_gen.py"
+    minute: '*/2'
+  tags:
+    - cron
